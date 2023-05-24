@@ -14,7 +14,7 @@ public class Objekti : MonoBehaviour
     [HideInInspector]
     public Vector2 atrPKoord;
     [HideInInspector]
-    public Vector2 bussMKoord;
+    public Vector2 bussKoord;
 
     public Canvas kanva;
 
@@ -33,7 +33,7 @@ public class Objekti : MonoBehaviour
 
         atkrMKoord = atkritumuMasina.GetComponent<RectTransform>().localPosition;
         atrPKoord = atraPalidziba.GetComponent<RectTransform>().localPosition;
-        bussMKoord = autobuss.GetComponent<RectTransform>().localPosition;
+        bussKoord = autobuss.GetComponent<RectTransform>().localPosition;
 
     }
 }
