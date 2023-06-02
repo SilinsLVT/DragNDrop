@@ -3,125 +3,105 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class NomesanasVieta : MonoBehaviour ,  IDropHandler
+
+public class NomesanasVieta : MonoBehaviour, IDropHandler
 {
-
-    private float vietasZRot, velkObjZRot, rotacijasStarpiba;
+    //Uzglabās velkamā objekta un nomešanas lauka z rotāciju,
+    // kāarī rotācijas un izmēru pieļaujamo starpību
+    private float vietasZrot, velkObjZrot, rotacijasStarpiba, xIzmeruStarp, yIzmeruStarp;
     private Vector2 vietasIzm, velkObjIzm;
-    private float xIzmStarpiba, yIzmStarpiba;
-
+    //Norāde uz Objekti skriptu
     public Objekti objektuSkripts;
 
-    public void OnDrop(PointerEventData eventData)
+    //Nostrādās, ja objektu cenšas nomest uz jebkuras nomešanas  vietas
+    public void OnDrop(PointerEventData notikums)
     {
-
-        if (eventData.pointerDrag != null) {
-
-
-            if (eventData.pointerDrag.tag.Equals(tag))
+        //Pārbauda vai tika vilkts un atlaists vispār kāds objekts
+        if (notikums.pointerDrag != null)
+        {
+            //Ja nomešanas vietas tags sakrīt ar vilktā objekta tagu
+            if (notikums.pointerDrag.tag.Equals(tag))
             {
-
-                vietasZRot = eventData.pointerDrag.GetComponent<RectTransform>().transform.eulerAngles.z;
-
-                velkObjZRot = GetComponent<RectTransform>().transform.eulerAngles.z;
-
-                rotacijasStarpiba = Mathf.Abs(vietasZRot = velkObjZRot);
-
-                vietasIzm = eventData.pointerDrag.GetComponent<RectTransform>().localScale;
-
+                //Iegūst objekta rotāciju grādos
+                vietasZrot = notikums.pointerDrag.GetComponent<RectTransform>().eulerAngles.z;
+                velkObjZrot = GetComponent<RectTransform>().eulerAngles.z;
+                //Aprēkina abu objektu z rotācijas starpību
+                rotacijasStarpiba = Mathf.Abs(vietasZrot - velkObjZrot);
+                //Līdzīgi kā ar Z rotāciju, jāpiefiksē objektu izmēri pa x un y asīm, kā arī starpība
+                vietasIzm = notikums.pointerDrag.GetComponent<RectTransform>().localScale;
                 velkObjIzm = GetComponent<RectTransform>().localScale;
-
-                xIzmStarpiba = Mathf.Abs(vietasIzm.x - velkObjIzm.x);
-                yIzmStarpiba = Mathf.Abs(vietasIzm.y - velkObjIzm.y);
-
+                xIzmeruStarp = Mathf.Abs(vietasIzm.x - velkObjIzm.x);
+                yIzmeruStarp = Mathf.Abs(vietasIzm.y - velkObjIzm.y);
 
 
-
-                rotacijasStarpiba = Mathf.Abs(vietasZRot - velkObjZRot);
-                Debug.Log("Objektu rotācijas starpība: " + rotacijasStarpiba + "\nPlatuma starpība: " + xIzmStarpiba + " \nAugstuma starpība: " + yIzmStarpiba);
-
-
-                if ((rotacijasStarpiba <= 6 || (rotacijasStarpiba >= 354 && rotacijasStarpiba <=360)) && (xIzmStarpiba <= 0.1 && yIzmStarpiba <= 0.1)) 
+                //Pārbauda vai objektu rotācijas un izmēru starpība ir pieļaujamajās robēžās
+                if ((rotacijasStarpiba <= 6 || (rotacijasStarpiba >= 354 && rotacijasStarpiba <= 360))
+                   && (xIzmeruStarp <= 0.1 && yIzmeruStarp <= 0.1))
                 {
-
-                    Debug.Log("Nomests pareizajā vietā!");
                     objektuSkripts.vaiIstajaVieta = true;
-                    eventData.pointerDrag.GetComponent<RectTransform>().anchoredPosition = GetComponent<RectTransform>().anchoredPosition;
+                    //Noliktais objekts smuki iecentrējas nomešanas laukā
+                    notikums.pointerDrag.GetComponent<RectTransform>().anchoredPosition
+                                = GetComponent<RectTransform>().anchoredPosition;
+                    //Rotācijai
+                    notikums.pointerDrag.GetComponent<RectTransform>().localRotation
+                                = GetComponent<RectTransform>().localRotation;
+                    //Izsmēram
+                    notikums.pointerDrag.GetComponent<RectTransform>().localScale
+                    = GetComponent<RectTransform>().localScale;
 
-                    eventData.pointerDrag.GetComponent<RectTransform>().localRotation = GetComponent<RectTransform>().localRotation;
-
-                    eventData.pointerDrag.GetComponent<RectTransform>().localScale = GetComponent<RectTransform>().localScale;
-
-
-                    switch (eventData.pointerDrag.tag)
+                    //Pārbauda tagu un atskaņo atbilstošo skaņas efektu
+                    switch (notikums.pointerDrag.tag)
                     {
-
-                        case "atkritumi":
-
+                        case "Atkritumi":
                             objektuSkripts.skanasAvots.PlayOneShot(objektuSkripts.skanasKoAtskanot[1]);
-
                             break;
 
-
-                        case "atrie":
-
+                        case "Slimnica":
                             objektuSkripts.skanasAvots.PlayOneShot(objektuSkripts.skanasKoAtskanot[2]);
-
                             break;
 
-
-                        case "buss":
-
+                        case "Skola":
                             objektuSkripts.skanasAvots.PlayOneShot(objektuSkripts.skanasKoAtskanot[3]);
-
                             break;
 
                         default:
-                            Debug.Log("Tags nav definēts!");
+                            Debug.Log("Nedefinēts tags!");
                             break;
-
                     }
 
                 }
 
-                //ja tagi nesakrit tatad nepareizaja vieta
-            } else {
+                //Ja objekts nomests nepareizajā laukā
+            }
+            else
+            {
                 objektuSkripts.vaiIstajaVieta = false;
-                objektuSkripts.skanasAvots.PlayOneShot(objektuSkripts.skanasKoAtskanot[0]);
+              //  objektuSkripts.skanasAvots.PlayOneShot(objektuSkripts.skanasKoAtskanot[0]);
 
-
-                switch (eventData.pointerDrag.tag)
+                //Objektu aizmet uz sākotnējo pozīciju
+                switch (notikums.pointerDrag.tag)
                 {
-
-                    case "atkritumi":
-
-                        objektuSkripts.atkritumuMasina.GetComponent<RectTransform>().localPosition = objektuSkripts.atkrMKoord;
-
+                    case "Atkritumi":
+                        objektuSkripts.AtkritumuMasina.GetComponent<RectTransform>().localPosition
+                                = objektuSkripts.atkrMKoord;
                         break;
 
-
-                    case "atrie":
-
-                        objektuSkripts.atraPalidziba.GetComponent<RectTransform>().localPosition = objektuSkripts.atrPKoord;
-
+                    case "Slimnica":
+                        objektuSkripts.AtraPalidziba.GetComponent<RectTransform>().localPosition
+                        = objektuSkripts.atrPKoord;
                         break;
 
-
-                    case "buss":
-
-                        objektuSkripts.autobuss.GetComponent<RectTransform>().localPosition = objektuSkripts.bussKoord;
-
+                    case "Skola":
+                        objektuSkripts.Autobuss.GetComponent<RectTransform>().localPosition
+                        = objektuSkripts.bussKoord;
                         break;
 
                     default:
-                        Debug.Log("Tags nav definēts!");
+                        Debug.Log("Nedefinēts tags!");
                         break;
-
                 }
+
             }
-
-        
         }
-
     }
 }

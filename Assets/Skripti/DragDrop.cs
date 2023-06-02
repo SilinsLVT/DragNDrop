@@ -50,9 +50,6 @@ public class DragDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, I
         Debug.Log("Beigta objekta vilkšana!");
         kanvasGrupa.alpha = 1f;
 
-
-        // objektuSkripts.pedejaisVilktais = eventData.pointerDrag;
-
         //Ja objekts nebija nolikts ītajā vietā
         if (objektuSkripts.vaiIstajaVieta == false)
         {
